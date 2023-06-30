@@ -5,15 +5,38 @@ import { useState, useEffect, useRef } from "react";
 
 import "@tomtom-international/web-sdk-maps/dist/maps.css";
 import * as tt from "@tomtom-international/web-sdk-maps";
+import axios from "axios";
 
 const MAX_ZOOM = 17;
 
 function App() {
-  const mapElement = useRef();
-  const [mapLongitude, setMapLongitude] = useState(-70.6870491511941);
-  const [mapLatitude, setMapLatitude] = useState(19.468557004525515);
-  const [mapZoom, setMapZoom] = useState(14);
-  const [map, setMap] = useState({});
+  const mapElement = useRef(null);
+  const marker = useRef(null);
+  const [mapLongitude, setMapLongitude] = useState(0);
+  const [mapLatitude, setMapLatitude] = useState(0);
+  const [mapZoom, setMapZoom] = useState(12);
+
+  const gpsUpdate = () => {
+    axios
+      .get("http://10.0.0.240:3001/api/terminal", {
+        params: {
+          idTerminal: 1,
+        },
+      })
+      .then(function (response) {
+        if (response.data.results.length > 0) {
+          setMapLatitude(response.data.results[0].latitud);
+          setMapLongitude(response.data.results[0].longitud);
+        } else {
+          console.log(response.data.results.length);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  setInterval(gpsUpdate, 2000);
 
   useEffect(() => {
     let map = tt.map({
@@ -22,15 +45,25 @@ function App() {
       center: [mapLongitude, mapLatitude],
       zoom: mapZoom,
     });
-    setMap(map);
-    const marker = new tt.Marker().setLngLat([-70.69449183, 19.47543933]).addTo(map);
+
+    marker.current = new tt.Marker()
+      .setLngLat([mapLongitude, mapLatitude])
+      .addTo(map);
+
+    //setMap(map);
 
     return () => map.remove();
   }, []);
 
+  useEffect(() => {
+    if (marker.current) {
+      marker.current.setLngLat([mapLongitude, mapLatitude]);
+    }
+  }, [mapLatitude, mapLongitude]);
+
   return (
     <div className="App">
-      <div className="navbar">SantiaGo  </div>
+      <div className="navbar">SantiaGo </div>
       <div ref={mapElement} className="mapDiv" />
     </div>
   );
