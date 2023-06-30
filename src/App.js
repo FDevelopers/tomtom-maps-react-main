@@ -11,14 +11,16 @@ const MAX_ZOOM = 17;
 
 function App() {
   const mapElement = useRef(null);
+  const map = useRef(null);
   const marker = useRef(null);
+
   const [mapLongitude, setMapLongitude] = useState(0);
   const [mapLatitude, setMapLatitude] = useState(0);
   const [mapZoom, setMapZoom] = useState(12);
 
   const gpsUpdate = () => {
     axios
-      .get("http://10.0.0.240:3001/api/terminal", {
+      .get("http://3.144.25.219:3001/api/terminal", {
         params: {
           idTerminal: 1,
         },
@@ -39,7 +41,7 @@ function App() {
   setInterval(gpsUpdate, 2000);
 
   useEffect(() => {
-    let map = tt.map({
+    map.current = tt.map({
       key: "cWyOruajYc67Vd8BOGfvSYQECKrLOAVG",
       container: mapElement.current,
       center: [mapLongitude, mapLatitude],
@@ -48,15 +50,14 @@ function App() {
 
     marker.current = new tt.Marker()
       .setLngLat([mapLongitude, mapLatitude])
-      .addTo(map);
+      .addTo(map.current);
 
-    //setMap(map);
-
-    return () => map.remove();
+    return () => map.current.remove();
   }, []);
 
   useEffect(() => {
-    if (marker.current) {
+    if (marker.current && map.current) {
+      map.current.setCenter([mapLongitude, mapLatitude]);
       marker.current.setLngLat([mapLongitude, mapLatitude]);
     }
   }, [mapLatitude, mapLongitude]);
