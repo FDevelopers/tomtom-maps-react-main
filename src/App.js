@@ -14,8 +14,8 @@ function App() {
   const map = useRef(null);
   const marker = useRef(null);
 
-  const [mapLongitude, setMapLongitude] = useState(0);
-  const [mapLatitude, setMapLatitude] = useState(0);
+  const [mapLongitude, setMapLongitude] = useState(19.449825312197184);
+  const [mapLatitude, setMapLatitude] = useState(-70.68639189195603);
   const [mapZoom, setMapZoom] = useState(12);
 
   const gpsUpdate = () => {
