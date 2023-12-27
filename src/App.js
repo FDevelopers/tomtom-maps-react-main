@@ -38,6 +38,10 @@ function App() {
       });
   };
 
+  const onMarkerClick = () => {
+    alert('Jeje')
+  }
+
   setInterval(gpsUpdate, 2000);
 
   useEffect(() => {
@@ -50,7 +54,8 @@ function App() {
 
     marker.current = new tt.Marker()
       .setLngLat([mapLongitude, mapLatitude])
-      .addTo(map.current);
+      .addTo(map.current)
+      .on("click", onMarkerClick);
 
     return () => map.current.remove();
   }, []);
